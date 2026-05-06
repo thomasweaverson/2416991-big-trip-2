@@ -17,5 +17,12 @@ const DEFAULT_POINT = {
   'type': DEFAULT_POINT_TYPE
 };
 
-export { DEFAULT_POINT, POINT_TYPES, DESTINATION_ID_START };
+const NoPointsMessages = {
+  EVERYTHING: 'Click New Event to create your first point',
+  PAST: 'There are no past events now',
+  PRESENT: 'There are no present events now',
+  FUTURE: 'There are no future events now'
+};
+
+export { DEFAULT_POINT, DESTINATION_ID_START, NoPointsMessages, POINT_TYPES };
 

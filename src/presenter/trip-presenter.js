@@ -1,4 +1,6 @@
 import { render, replace } from '../framework/render.js';
+import { NoPointsMessages } from '../utils/const.js';
+import NoPointsView from '../view/no-points-view.js';
 import PointFormView from '../view/point-form-view.js';
 import PointView from '../view/point-view.js';
 import PointsListView from '../view/points-list-view.js';
@@ -20,9 +22,21 @@ export default class TripPresenter {
     this.#newPointModel = newPointModel;
   }
 
+  #renderSort() {
+    const sortComponent = new SortView();
+
+    render(sortComponent, this.#tripContainer);
+  }
+
+  #renderPointsList() {
+    render(this.#pointsListComponent, this.#tripContainer);
+  }
+
   #renderPoint(point) {
     const destinationExtended = this.#destinationsModel.getDestination(point.destination);
     const selectedOffers = this.#offersModel.getSelectedOffers(point.type, point.offers);
+
+    const pointsListContainer = this.#pointsListComponent.element;
 
     const escKeyDownHandler = (evt) => {
       if (evt.key === 'Escape') {
@@ -70,17 +84,29 @@ export default class TripPresenter {
       replace(pointComponent, formComponent);
     }
 
-    render(pointComponent, this.#tripContainer);
+    render(pointComponent, pointsListContainer);
+  }
+
+  #renderPoints(points) {
+    points.forEach((point) => {
+      this.#renderPoint(point);
+    });
   }
 
   #renderBoard() {
-    const points = this.#pointsModel.points;
-    render(this.#pointsListComponent, this.#tripContainer);
-    points.forEach((point) => this.#renderPoint(point));
+    const points = [...this.#pointsModel.points];
+
+    if (points.length === 0) {
+      render(new NoPointsView(NoPointsMessages.EVERYTHING), this.#tripContainer);
+      return;
+    }
+
+    this.#renderSort();
+    this.#renderPointsList();
+    this.#renderPoints(points);
   }
 
   init() {
-    render(new SortView(), this.#tripContainer);
     this.#renderBoard();
   }
 }

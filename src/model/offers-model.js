@@ -5,6 +5,12 @@ const mockOffers = getMockOffers();
 export default class OffersModel {
   #offers = [...mockOffers];
 
+  constructor({ offersApiService }) {
+    offersApiService.offers.then((offers) => {
+      console.log(offers);
+    });
+  }
+
   get offers() {
     return this.#offers;
   }

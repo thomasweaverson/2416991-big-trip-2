@@ -1,13 +1,9 @@
-import ApiService from './framework/api-service';
-
-const Method = {
-  GET: 'GET',
-  PUT: 'PUT',
-};
+import ApiService from '../framework/api-service';
+import { EndPoints, Method } from '../utils/api';
 
 export default class PointsApiService extends ApiService {
   get points() {
-    return this._load({ url: 'points' })
+    return this._load({ url: EndPoints.POINTS })
       .then(ApiService.parseResponse);
   }
 

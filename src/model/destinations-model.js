@@ -1,9 +1,15 @@
 import { getMockDestinations } from '../mocks';
 
-const destinations = getMockDestinations();
+const mockDestinations = getMockDestinations();
 
 export default class DestinationsModel {
-  #destinations = [...destinations];
+  #destinations = [...mockDestinations];
+
+  constructor({ destinationsApiService }) {
+    destinationsApiService.destinations.then((destinations) => {
+      console.log(destinations);
+    });
+  }
 
   get destinations() {
     return this.#destinations;

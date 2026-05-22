@@ -20,11 +20,6 @@ export default class DestinationsModel {
   }
 
   getDestination(id) {
-    const result = this.#destinations.find((destination) => destination.id === id);
-
-    return result ? { ...result } : {
-      id: id,
-      name: id.slice(3)
-    };
+    return this.#destinations.find((destination) => destination.id === id);
   }
 }

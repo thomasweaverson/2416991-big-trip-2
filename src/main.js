@@ -56,10 +56,14 @@ function handleNewPointButtonClick() {
 
 render(newPointButtonComponent, mainContainer);
 
-filterPresenter.init();
-tripPresenter.init();
+const initApp = async () => {
+  filterPresenter.init();
+  tripPresenter.init();
 
-pointsModel.init();
-offersModel.init();
-destinationsModel.init();
+  await offersModel.init();
+  await destinationsModel.init();
+  await pointsModel.init();
+};
+
+initApp();
 

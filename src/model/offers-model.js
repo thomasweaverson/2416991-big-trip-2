@@ -19,14 +19,17 @@ export default class OffersModel {
     return this.#offers;
   }
 
-  getOffersByType(type) {
-    return this.#offers.find((offer) => offer.type === type).offers;
-  }
-
   getSelectedOffers(type, idList) {
-    const offersOfType = this.getOffersByType(type);
+    const offersOfType = this.#getOffersByType(type);
     const selectedOffers = offersOfType.filter((offer) => idList.includes(offer.id));
 
     return selectedOffers;
+  }
+
+  #getOffersByType(type) {
+    if (!this.#offers.length) {
+      return [];
+    }
+    return this.#offers.find((offer) => offer.type === type).offers;
   }
 }

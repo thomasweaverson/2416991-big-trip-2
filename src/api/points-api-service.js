@@ -9,7 +9,7 @@ export default class PointsApiService extends ApiService {
 
   async updatePoint(point) {
     const response = await this._load({
-      url: `tasks/${point.id}`,
+      url: `${EndPoints.POINTS}/${point.id}`,
       method: Method.PUT,
       body: JSON.stringify(this.#adaptToServer(point)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -23,7 +23,7 @@ export default class PointsApiService extends ApiService {
   #adaptToServer(point) {
     const adaptedPoint = {
       ...point,
-      'base_price': point.basePrice,
+      'base_price': +point.basePrice,
       'date_from': point.dateFrom,
       'date_to': point.dateTo,
       'is_favorite': point.isFavorite,

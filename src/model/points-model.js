@@ -1,26 +1,25 @@
 import Observable from '../framework/observable';
-import { generateMockPoints } from '../mocks';
-
-const MOCK_POINTS_NUMBER = 6;
-
-const points = generateMockPoints(MOCK_POINTS_NUMBER);
 
 export default class PointsModel extends Observable {
   #pointsApiService = null;
-  #points = [...points];
+  #points = [];
 
   constructor({ pointsApiService }) {
     super();
     this.#pointsApiService = pointsApiService;
-
-    this.#pointsApiService.points.then((loadedPoints) => {
-      console.log(loadedPoints.map((point) => this.#adaptToClient(point)));
-    });
   }
-
 
   get points() {
     return this.#points;
+  }
+
+  async init() {
+    try {
+      const points = await this.#pointsApiService.points;
+      this.#points = points.map(this.#adaptToClient);
+    } catch (error) {
+      this.#points = [];
+    }
   }
 
   updatePoint(updateType, update) {

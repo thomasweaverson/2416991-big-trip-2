@@ -54,15 +54,18 @@ function handleNewPointButtonClick() {
   newPointButtonComponent.element.disabled = true;
 }
 
-render(newPointButtonComponent, mainContainer);
-
 const initApp = async () => {
   filterPresenter.init();
   tripPresenter.init();
 
-  await offersModel.init();
-  await destinationsModel.init();
-  await pointsModel.init();
+  Promise.all([
+    offersModel.init(),
+    destinationsModel.init(),
+  ]).then(() => {
+    pointsModel.init();
+  }).finally(() => {
+    render(newPointButtonComponent, mainContainer);
+  });
 };
 
 initApp();

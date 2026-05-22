@@ -44,15 +44,16 @@ const SortItem = {
 };
 
 const UserAction = {
-  UPDATE_POINT: 'UPDATE_POINT',
-  ADD_POINT: 'ADD_POINT',
-  DELETE_POINT: 'DELETE_POINT'
+  UPDATE_POINT: 'update-point',
+  ADD_POINT: 'add-point',
+  DELETE_POINT: 'delete-point'
 };
 
 const UpdateType = {
-  PATCH: 'PATCH',
-  MINOR: 'MINOR',
-  MAJOR: 'MAJOR'
+  PATCH: 'patch',
+  MINOR: 'minor',
+  MAJOR: 'major',
+  INIT: 'init'
 };
 
 const FilterType = {

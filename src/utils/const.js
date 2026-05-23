@@ -5,7 +5,7 @@ const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-i
 const DEFAULT_POINT_TYPE = POINT_TYPES[5];
 
 const DEFAULT_POINT = {
-  'id': null,
+  'id': 'new-point',
   'basePrice': 0,
   'dateFrom': '',
   'dateTo': '',

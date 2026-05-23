@@ -170,6 +170,7 @@ const createDestinationTemplate = (destination) => {
   `;
 };
 
+
 const createPointFormTemplate = ({
   point,
   offers,
@@ -237,7 +238,6 @@ export default class PointFormView extends AbstractStatefulView {
     this.#handleFormReset = onFormReset;
     this.#handleRollupClick = onRollupClick;
     this.#isNewPoint = isNewPoint;
-
     this._restoreHandlers();
   }
 

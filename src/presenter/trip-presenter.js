@@ -45,13 +45,6 @@ export default class TripPresenter {
     this.#filterModel = filterModel;
     this.#handleNewPointDestroy = onNewPointDestroy;
 
-    this.#newPointPresenter = new NewPointPresenter({
-      offers: this.#offersModel.offers,
-      destinations: this.#destinationsModel.destinations,
-      onDataChange: this.#handleViewAction,
-      onDestroy: this.#newPointDestroyHandler
-    });
-
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
@@ -121,6 +114,12 @@ export default class TripPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
+        this.#newPointPresenter = new NewPointPresenter({
+          offers: this.#offersModel.offers,
+          destinations: this.#destinationsModel.destinations,
+          onDataChange: this.#handleViewAction,
+          onDestroy: this.#newPointDestroyHandler
+        });
         this.#renderBoard();
         break;
     }

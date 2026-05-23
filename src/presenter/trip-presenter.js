@@ -3,6 +3,7 @@ import { FilterType, SortItem, UpdateType, UserAction } from '../utils/const.js'
 import { filter } from '../utils/filter.js';
 
 import { sortPoints } from '../utils/sort.js';
+import LoadingView from '../view/loading-view.js';
 import NoPointsView from '../view/no-points-view.js';
 import PointsListView from '../view/points-list-view.js';
 import SortView from '../view/sort-view.js';
@@ -12,6 +13,7 @@ import PointPresenter from './point-presenter.js';
 export default class TripPresenter {
   #tripContainer = null;
   #pointsListComponent = null;
+  #loadingComponent = new LoadingView();
   #offersModel = null;
   #destinationsModel = null;
   #pointsModel = null;
@@ -26,6 +28,7 @@ export default class TripPresenter {
 
   #points = [];
   #handleNewPointDestroy = null;
+  #isLoading = true;
 
   constructor({
     tripContainer,
@@ -115,8 +118,17 @@ export default class TripPresenter {
         });
         this.#renderBoard();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
     }
   };
+
+  #renderLoading() {
+    render(this.#loadingComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
+  }
 
   #renderSort() {
     this.#sortComponent = new SortView({
@@ -179,6 +191,11 @@ export default class TripPresenter {
   }
 
   #renderBoard() {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     if (this.points.length === 0) {
       this.#renderNoPoints();
       return;

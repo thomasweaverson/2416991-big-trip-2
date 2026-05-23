@@ -186,7 +186,7 @@ const createPointFormTemplate = ({
     type,
   } = point;
 
-  const offersOfCurrentType = offers.find((offer) => offer.type === type).offers || [];
+  const offersOfCurrentType = offers.find((offer) => offer.type === type)?.offers || [];
 
   const isSubmitDisabled = !isPointDataValid(point, currentDestination, destinations);
 
@@ -277,7 +277,11 @@ export default class PointFormView extends AbstractStatefulView {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#typeClickHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#priceChangeHandler);
-    this.element.querySelector('.event__available-offers').addEventListener('click', this.#offerClickHandler);
+
+    const availableOffers = this.element.querySelector('.event__available-offers');
+    if (availableOffers) {
+      availableOffers.addEventListener('click', this.#offerClickHandler);
+    }
 
     this.#setDatePickers();
   }

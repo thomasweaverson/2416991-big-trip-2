@@ -84,15 +84,23 @@ const createPriceTemplate = (basePrice, id) => `
   </div>
 `;
 
-const createButtonTemplate = ({ isResetButton, isNewPoint, isDisabled }) => {
+const createButtonTemplate = ({ isResetButton, isNewPoint, isDisabled, isSaving, isDeleting }) => {
+  let resetButtonText = 'Cancel';
+
+  if (!isNewPoint) {
+    resetButtonText = isDeleting ? 'Deleting...' : 'Delete';
+  }
+
+  const submitButtonText = isSaving ? 'Saving...' : 'Save';
+
   if (isResetButton) {
     return `
-      <button class="event__reset-btn" type="reset">${isNewPoint ? 'Cancel' : 'Delete'}</button>
+      <button class="event__reset-btn" type="reset">${resetButtonText}</button>
     `;
   }
 
   return `
-    <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>Save</button>
+    <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${submitButtonText}</button>
   `;
 };
 
@@ -170,7 +178,6 @@ const createDestinationTemplate = (destination) => {
   `;
 };
 
-
 const createPointFormTemplate = ({
   point,
   offers,
@@ -185,11 +192,13 @@ const createPointFormTemplate = ({
     dateTo,
     id,
     type,
+    isDisabled,
+    offers: selectedOffersId,
+    isSaving,
+    isDeleting
   } = point;
 
   const offersOfCurrentType = offers.find((offer) => offer.type === type)?.offers || [];
-
-  const isSubmitDisabled = !isPointDataValid(point, currentDestination, destinations);
 
   return `
     <li class="trip-events__item">
@@ -199,12 +208,12 @@ const createPointFormTemplate = ({
           ${createDestinationInputTemplate({ id, type, currentDestination, destinations })}
           ${createDateInterfaceTemplate(dateFrom, dateTo, id)}
           ${createPriceTemplate(basePrice, id)}
-          ${createButtonTemplate({ isResetButton: false, isDisabled: isSubmitDisabled })}
-          ${createButtonTemplate({ isResetButton: true, isNewPoint })}
+          ${createButtonTemplate({ isResetButton: false, isDisabled, isSaving, isDeleting, isNewPoint })}
+          ${createButtonTemplate({ isResetButton: true, isNewPoint, isSaving, isDeleting })}
           ${!isNewPoint ? createRollupButtonTemplate() : ''}
         </header>
         <section class="event__details">
-          ${createOffersTemplate(offersOfCurrentType, point.offers)}
+          ${createOffersTemplate(offersOfCurrentType, selectedOffersId)}
           ${createDestinationTemplate(currentDestination)}
         </section>
       </form>
@@ -231,7 +240,7 @@ export default class PointFormView extends AbstractStatefulView {
     isNewPoint = false
   }) {
     super();
-    this._setState(point);
+    this._setState(PointFormView.parsePointToState(point));
     this.#offers = offers;
     this.#destinations = destinations;
     this.#handleFormSubmit = onFormSubmit;
@@ -288,7 +297,7 @@ export default class PointFormView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this._state);
+    this.#handleFormSubmit(PointFormView.parseStateToPoint(this._state));
   };
 
   #typeClickHandler = (evt) => {
@@ -360,10 +369,7 @@ export default class PointFormView extends AbstractStatefulView {
       basePrice: evt.target.value
     });
 
-    const submitButton = this.element.querySelector('.event__save-btn');
-    const currentDestination = this.#getCurrentDestination();
-    const isSubmitDisabled = !isPointDataValid(this._state, currentDestination, this.#destinations);
-    submitButton.disabled = isSubmitDisabled;
+    this.#setDisableStateSubmitButton();
   };
 
   #offerClickHandler = (evt) => {
@@ -382,6 +388,15 @@ export default class PointFormView extends AbstractStatefulView {
     }
   };
 
+  #setDisableStateSubmitButton = () => {
+    const submitButton = this.element.querySelector('.event__save-btn');
+    const currentDestination = this.#getCurrentDestination();
+    const isSubmitDisabled = !isPointDataValid(this._state, currentDestination, this.#destinations);
+    const isFormDisabled = this._state.isDisabled;
+
+    submitButton.disabled = isSubmitDisabled || isFormDisabled;
+  };
+
   #getCurrentDestination() {
     const currentDestination = this.#destinations.find((item) => item.id === this._state.destination);
     if (currentDestination) {
@@ -391,5 +406,24 @@ export default class PointFormView extends AbstractStatefulView {
       id: this._state.destination,
       name: this._state.destination.slice(3)
     };
+  }
+
+  static parsePointToState(point) {
+    return {
+      ...point,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false
+    };
+  }
+
+  static parseStateToPoint(state) {
+    const point = { ...state };
+
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+
+    return point;
   }
 }

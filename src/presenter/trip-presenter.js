@@ -1,5 +1,6 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
-import { FilterType, SortItem, UpdateType, UserAction } from '../utils/const.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import { FilterType, SortItem, TimeLimit, UpdateType, UserAction } from '../utils/const.js';
 import { filter } from '../utils/filter.js';
 
 import { sortPoints } from '../utils/sort.js';
@@ -29,6 +30,11 @@ export default class TripPresenter {
   #points = [];
   #handleNewPointDestroy = null;
   #isLoading = true;
+
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({
     tripContainer,
@@ -83,6 +89,8 @@ export default class TripPresenter {
   };
 
   #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this.#pointPresenters.get(update.id).setSaving();
@@ -109,6 +117,8 @@ export default class TripPresenter {
         }
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {

@@ -109,6 +109,18 @@ export default class PointPresenter {
     }
   }
 
+  setAborting() {
+    const resetFormState = () => {
+      this.#pointFormComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointFormComponent.shake(resetFormState);
+  }
+
   #rollupClickHandler = () => {
     if (this.#mode === Mode.DEFAULT) {
       this.#replacePointToForm();

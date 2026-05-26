@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 
+const MIN_DIFFERENCE_IN_MINUTES = 5;
+
 const pad = (num) => String(num).padStart(2, '0');
 
 const formatToTime = (date) => dayjs(date).format('HH:mm');
@@ -32,5 +34,5 @@ const isDatesEqual = (pointA, pointB) => {
   return isDateFromSame && isDateToSame;
 };
 
-export { calculateEventDuration, formatToDateInput, formatToTime, isDatesEqual };
+export { calculateEventDuration, formatToDateInput, formatToTime, isDatesEqual, MIN_DIFFERENCE_IN_MINUTES };
 

@@ -2,7 +2,7 @@ import flatpickr from 'flatpickr';
 import he from 'he';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPES } from '../utils/const.js';
-import { formatToDateInput } from '../utils/date.js';
+import { formatToDateInput, MIN_DIFFERENCE_IN_MINUTES } from '../utils/date.js';
 import { capitalize } from '../utils/text.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
@@ -200,6 +200,9 @@ const createPointFormTemplate = ({
 
   const offersOfCurrentType = offers.find((offer) => offer.type === type)?.offers || [];
 
+  const isValid = isPointDataValid(point, currentDestination, destinations);
+  const calculatedDisabled = isDisabled || !isValid;
+
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -208,7 +211,7 @@ const createPointFormTemplate = ({
           ${createDestinationInputTemplate({ id, type, currentDestination, destinations })}
           ${createDateInterfaceTemplate(dateFrom, dateTo, id)}
           ${createPriceTemplate(basePrice, id)}
-          ${createButtonTemplate({ isResetButton: false, isDisabled, isSaving, isDeleting, isNewPoint })}
+          ${createButtonTemplate({ isResetButton: false, isDisabled: calculatedDisabled, isSaving, isDeleting, isNewPoint })}
           ${createButtonTemplate({ isResetButton: true, isNewPoint, isSaving, isDeleting })}
           ${!isNewPoint ? createRollupButtonTemplate() : ''}
         </header>
@@ -247,6 +250,7 @@ export default class PointFormView extends AbstractStatefulView {
     this.#handleFormReset = onFormReset;
     this.#handleRollupClick = onRollupClick;
     this.#isNewPoint = isNewPoint;
+
     this._restoreHandlers();
   }
 
@@ -257,9 +261,14 @@ export default class PointFormView extends AbstractStatefulView {
       offers: this.#offers,
       currentDestination: this.#getCurrentDestination(),
       destinations: this.#destinations,
-      isNewPoint: this.#isNewPoint
+      isNewPoint: this.#isNewPoint,
     });
   }
+
+  // updateElement(point) {
+  //   super.updateElement(point);
+  //   this.#setDisableStateSubmitButton();
+  // }
 
   removeElement() {
     super.removeElement();
@@ -333,7 +342,10 @@ export default class PointFormView extends AbstractStatefulView {
       dateFrom: userDate
     });
 
-    this.#datepickers[1].set('minDate', userDate);
+    const minDate = new Date(userDate);
+    minDate.setMinutes(minDate.getMinutes() + MIN_DIFFERENCE_IN_MINUTES);
+
+    this.#datepickers[1].set('minDate', minDate);
   };
 
   #dateToChangeHandler = ([userDate]) => {
@@ -341,7 +353,10 @@ export default class PointFormView extends AbstractStatefulView {
       dateTo: userDate
     });
 
-    this.#datepickers[0].set('maxDate', userDate);
+    const maxDate = new Date(userDate);
+    maxDate.setMinutes(maxDate.getMinutes() - MIN_DIFFERENCE_IN_MINUTES);
+
+    this.#datepickers[0].set('maxDate', maxDate);
   };
 
   #setDatePickers() {

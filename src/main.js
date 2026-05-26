@@ -63,6 +63,8 @@ const initApp = async () => {
     destinationsModel.init(),
   ]).then(() => {
     pointsModel.init();
+  }).then(() => {
+
   }).catch(() => {
     // обработать возможные ошибки. Придумать заглушку например
   }).finally(() => {

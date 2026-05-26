@@ -44,6 +44,7 @@ export default class NewPointPresenter {
       pointsListContainer,
       RenderPosition.AFTERBEGIN
     );
+
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
@@ -72,13 +73,10 @@ export default class NewPointPresenter {
       this.#pointFormComponent.updateElement({
         isDisabled: false,
         isSaving: false,
-        isDeleting: false,
       });
     };
-
     this.#pointFormComponent.shake(resetFormState);
   }
-
 
   #handleFormSubmit = (point) => {
     const pointToAdd = {

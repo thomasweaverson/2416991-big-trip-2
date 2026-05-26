@@ -71,8 +71,6 @@ export default class PointPresenter {
 
     if (this.#mode === Mode.FORM) {
       replace(this.#pointFormComponent, previousPointFormComponent);
-      //! why? vVv разобраться
-      this.#mode = Mode.DEFAULT;
     }
 
     remove(previousPointComponent);
@@ -117,7 +115,7 @@ export default class PointPresenter {
         isDeleting: false,
       });
     };
-
+    this.#pointComponent.shake();
     this.#pointFormComponent.shake(resetFormState);
   }
 
@@ -150,7 +148,6 @@ export default class PointPresenter {
       isPatchUpdate ? UpdateType.PATCH : UpdateType.MINOR,
       point
     );
-
     // this.#replaceFormToPoint();
   };
 

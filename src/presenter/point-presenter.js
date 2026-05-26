@@ -71,6 +71,8 @@ export default class PointPresenter {
 
     if (this.#mode === Mode.FORM) {
       replace(this.#pointFormComponent, previousPointFormComponent);
+      //! why? vVv разобраться
+      this.#mode = Mode.DEFAULT;
     }
 
     remove(previousPointComponent);
@@ -86,6 +88,24 @@ export default class PointPresenter {
     if (this.#mode !== Mode.DEFAULT) {
       this.#pointFormComponent.reset(this.#point);
       this.#replaceFormToPoint();
+    }
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.FORM) {
+      this.#pointFormComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.FORM) {
+      this.#pointFormComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
     }
   }
 
@@ -112,13 +132,14 @@ export default class PointPresenter {
       return;
     }
     const isPatchUpdate = isDatesEqual(this.#point, point);
+
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
       isPatchUpdate ? UpdateType.PATCH : UpdateType.MINOR,
       point
     );
 
-    this.#replaceFormToPoint();
+    // this.#replaceFormToPoint();
   };
 
   #deleteClickHandler = () => {

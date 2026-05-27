@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import { remove, render, RenderPosition } from '../framework/render';
 import { DEFAULT_POINT, UpdateType, UserAction } from '../utils/const';
 import PointFormView from '../view/point-form-view';
@@ -31,7 +30,6 @@ export default class NewPointPresenter {
     this.#pointFormComponent = new PointFormView({
       point: {
         ...DEFAULT_POINT,
-        id: nanoid()
       },
       offers: this.#offers,
       destinations: this.#destinations,
@@ -46,6 +44,7 @@ export default class NewPointPresenter {
       pointsListContainer,
       RenderPosition.AFTERBEGIN
     );
+
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
@@ -62,11 +61,34 @@ export default class NewPointPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
+  setSaving() {
+    this.#pointFormComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#pointFormComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+      });
+    };
+    this.#pointFormComponent.shake(resetFormState);
+  }
+
   #handleFormSubmit = (point) => {
+    const pointToAdd = {
+      ...point,
+    };
+
+    delete pointToAdd.id;
+
     this.#handleDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      point
+      pointToAdd
     );
     this.destroy();
   };

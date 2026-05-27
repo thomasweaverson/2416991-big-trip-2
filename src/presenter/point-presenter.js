@@ -89,6 +89,36 @@ export default class PointPresenter {
     }
   }
 
+  setSaving() {
+    if (this.#mode === Mode.FORM) {
+      this.#pointFormComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.FORM) {
+      this.#pointFormComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#pointFormComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+    this.#pointComponent.shake();
+    this.#pointFormComponent.shake(resetFormState);
+  }
+
   #rollupClickHandler = () => {
     if (this.#mode === Mode.DEFAULT) {
       this.#replacePointToForm();
@@ -112,13 +142,13 @@ export default class PointPresenter {
       return;
     }
     const isPatchUpdate = isDatesEqual(this.#point, point);
+
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
       isPatchUpdate ? UpdateType.PATCH : UpdateType.MINOR,
       point
     );
-
-    this.#replaceFormToPoint();
+    // this.#replaceFormToPoint();
   };
 
   #deleteClickHandler = () => {

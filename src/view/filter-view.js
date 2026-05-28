@@ -1,9 +1,12 @@
 import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view.js';
 import { FilterType } from '../utils/const.js';
-import { capitalize } from '../utils/text.js';
+import { capitalize } from '../utils/utils.js';
 
-const isFilterDisabled = (filterType, points) => {
+const isFilterDisabled = (filterType, points, isLoadingError) => {
+  if (isLoadingError) {
+    return true;
+  }
   const now = dayjs();
   switch (filterType) {
     case FilterType.FUTURE:
@@ -19,16 +22,16 @@ const isFilterDisabled = (filterType, points) => {
   }
 };
 
-const createFilterItemTemplate = (filterType, isChecked, points) => `
+const createFilterItemTemplate = (filterType, isChecked, points, isLoadingError) => `
   <div class="trip-filters__filter">
-    <input id="filter-${filterType}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterType}" ${isChecked ? 'checked' : ''} ${isFilterDisabled(filterType, points) ? 'disabled' : ''}>
+    <input id="filter-${filterType}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterType}" ${isChecked ? 'checked' : ''} ${isFilterDisabled(filterType, points, isLoadingError) ? 'disabled' : ''}>
     <label class="trip-filters__filter-label" for="filter-${filterType}">${capitalize(filterType)}</label>
   </div>
 `;
 
-const createFilterTemplate = (points, currentFilter) => {
+const createFilterTemplate = (points, currentFilter, isLoadingError) => {
   const filterItems = Object.values(FilterType)
-    .map((item) => createFilterItemTemplate(item, item === currentFilter, points))
+    .map((item) => createFilterItemTemplate(item, item === currentFilter, points, isLoadingError))
     .join('\n');
 
   return `
@@ -44,18 +47,20 @@ export default class FilterView extends AbstractView {
   #points = null;
   #currentFilter = null;
   #handleFilterChange = null;
+  #isLoadingError = false;
 
-  constructor({ points, currentFilter, onFilterChange }) {
+  constructor({ points, currentFilter, onFilterChange, isLoadingError }) {
     super();
     this.#points = points;
     this.#currentFilter = currentFilter;
     this.#handleFilterChange = onFilterChange;
+    this.#isLoadingError = isLoadingError;
 
     this.element.addEventListener('change', this.#filterChangeHandler);
   }
 
   get template() {
-    return createFilterTemplate(this.#points, this.#currentFilter);
+    return createFilterTemplate(this.#points, this.#currentFilter, this.#isLoadingError);
   }
 
   #filterChangeHandler = (evt) => {

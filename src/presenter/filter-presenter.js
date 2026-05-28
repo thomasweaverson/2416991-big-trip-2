@@ -3,23 +3,23 @@ import FilterView from '../view/filter-view';
 
 export default class FilterPresenter {
   #filterContainer = null;
-  #pointsModel = null;
+  #appModel = null;
   #filterModel = null;
-
   #filterComponent = null;
 
-  constructor({ filterContainer, pointsModel, filterModel }) {
+  constructor({ filterContainer, appModel, filterModel }) {
     this.#filterContainer = filterContainer;
-    this.#pointsModel = pointsModel;
+    this.#appModel = appModel;
     this.#filterModel = filterModel;
   }
 
-  init() {
+  init({ isLoadingError = false } = {}) {
     const prevFilterComponent = this.#filterComponent;
     this.#filterComponent = new FilterView({
-      points: this.#pointsModel.points,
+      points: this.#appModel.points,
       currentFilter: this.#filterModel.filter,
-      onFilterChange: this.#handleFilterTypeChange
+      onFilterChange: this.#handleFilterTypeChange,
+      isLoadingError
     });
 
     if (prevFilterComponent === null) {

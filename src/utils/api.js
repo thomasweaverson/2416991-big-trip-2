@@ -1,4 +1,4 @@
-const AUTHORIZATION = 'Basic si42ci42li42a42n';
+const AUTHORIZATION = 'Basic si42ci42li42a41n';
 
 const BASE_URL = 'https://22.objects.htmlacademy.pro/big-trip';
 

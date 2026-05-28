@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view.js';
 import { calculateEventDuration, formatToTime } from '../utils/date.js';
-import { capitalize } from '../utils/text.js';
+import { capitalize } from '../utils/utils.js';
 
 const createOfferTemplate = ({ title, price }) => (
   `

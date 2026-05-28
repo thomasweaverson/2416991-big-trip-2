@@ -1,5 +1,3 @@
-const DESTINATION_ID_START = 1001;
-
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 const DEFAULT_POINT_TYPE = POINT_TYPES[5];
@@ -53,7 +51,8 @@ const UpdateType = {
   PATCH: 'patch',
   MINOR: 'minor',
   MAJOR: 'major',
-  INIT: 'init'
+  INIT: 'init',
+  ERROR: 'error'
 };
 
 const FilterType = {
@@ -68,5 +67,5 @@ const TimeLimit = {
   UPPER_LIMIT: 1000,
 };
 
-export { DEFAULT_POINT, DESTINATION_ID_START, FilterType, POINT_TYPES, SortItem, UpdateType, UserAction, TimeLimit };
+export { DEFAULT_POINT, FilterType, POINT_TYPES, SortItem, UpdateType, UserAction, TimeLimit };
 

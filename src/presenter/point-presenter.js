@@ -12,8 +12,7 @@ const Mode = {
 
 export default class PointPresenter {
   #pointListContainer = null;
-  #destinationsModel = null;
-  #offersModel = null;
+  #appModel = null;
   #handleDataChange = null;
   #handleModeChange = null;
 
@@ -25,14 +24,12 @@ export default class PointPresenter {
 
   constructor({
     pointListContainer,
-    destinationsModel,
-    offersModel,
+    appModel,
     onDataChange,
     onModeChange
   }) {
     this.#pointListContainer = pointListContainer;
-    this.#destinationsModel = destinationsModel;
-    this.#offersModel = offersModel;
+    this.#appModel = appModel;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
   }
@@ -44,17 +41,17 @@ export default class PointPresenter {
 
     this.#pointComponent = new PointView({
       point: this.#point,
-      destination: this.#destinationsModel.getDestination(this.#point.destination),
-      selectedOffers: this.#offersModel.getSelectedOffers(this.#point.type, this.#point.offers),
+      destination: this.#appModel.getDestination(this.#point.destination),
+      selectedOffers: this.#appModel.getSelectedOffers(this.#point.type, this.#point.offers),
       onRollupClick: this.#rollupClickHandler,
       onFavoriteClick: this.#handleFavoriteClick,
     });
 
     this.#pointFormComponent = new PointFormView({
       point: this.#point,
-      offers: this.#offersModel.offers,
-      currentDestination: this.#destinationsModel.getDestination(this.#point.destination),
-      destinations: this.#destinationsModel.destinations,
+      offers: this.#appModel.offers,
+      currentDestination: this.#appModel.getDestination(this.#point.destination),
+      destinations: this.#appModel.destinations,
       onFormSubmit: this.#handleFormSubmit,
       onFormReset: this.#deleteClickHandler,
       onRollupClick: this.#rollupClickHandler

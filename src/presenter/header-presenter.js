@@ -1,35 +1,31 @@
 import dayjs from 'dayjs';
 import { remove, render, RenderPosition, replace } from '../framework/render';
+import { UpdateType } from '../utils/const';
 import { sortPoints } from '../utils/sort';
 import TripInfoView from '../view/trip-info-view';
 import FilterPresenter from './filter-presenter';
-import { UpdateType } from '../utils/const';
 
 export default class HeaderPresenter {
   #summaryContainer = null;
-  #pointsModel = null;
-  #offersModel = null;
-  #destinationsModel = null;
+  #appModel = null;
   #filterModel = null;
   #filterPresenter = null;
   #newPointButtonComponent = null;
   #tripInfoComponent = null;
 
-  constructor({ summaryContainer, pointsModel, offersModel, destinationsModel, filterModel, newPointButtonComponent }) {
+  constructor({ summaryContainer, appModel, filterModel, newPointButtonComponent }) {
     this.#summaryContainer = summaryContainer;
-    this.#pointsModel = pointsModel;
-    this.#offersModel = offersModel;
-    this.#destinationsModel = destinationsModel;
+    this.#appModel = appModel;
     this.#filterModel = filterModel;
     this.#newPointButtonComponent = newPointButtonComponent;
 
     this.#filterPresenter = new FilterPresenter({
       filterContainer: summaryContainer.querySelector('.trip-controls__filters'),
-      pointsModel: this.#pointsModel,
+      appModel: this.#appModel,
       filterModel: this.#filterModel
     });
 
-    this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#appModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
@@ -48,6 +44,13 @@ export default class HeaderPresenter {
       case UpdateType.INIT:
         this.#init();
         render(this.#newPointButtonComponent, this.#summaryContainer, RenderPosition.BEFOREEND);
+        break;
+      case UpdateType.ERROR:
+        render(this.#newPointButtonComponent, this.#summaryContainer, RenderPosition.BEFOREEND);
+        this.#newPointButtonComponent.disable();
+        this.#filterPresenter.init({
+          isLoadingError: true
+        });
         break;
     }
   };
@@ -70,23 +73,23 @@ export default class HeaderPresenter {
   }
 
   #getTitle() {
-    const sortedPoints = sortPoints(this.#pointsModel.points);
+    const sortedPoints = sortPoints(this.#appModel.points);
 
     const pointsCount = sortedPoints.length;
 
     if (pointsCount === 1) {
-      const destination = this.#destinationsModel.getDestination(sortedPoints[0].destination);
+      const destination = this.#appModel.getDestination(sortedPoints[0].destination);
       return destination.name;
     }
-    const startDestination = this.#destinationsModel.getDestination(sortedPoints[0].destination);
-    const endDestination = this.#destinationsModel.getDestination(sortedPoints[sortedPoints.length - 1].destination);
+    const startDestination = this.#appModel.getDestination(sortedPoints[0].destination);
+    const endDestination = this.#appModel.getDestination(sortedPoints[sortedPoints.length - 1].destination);
 
     if (pointsCount === 2) {
       return `${startDestination.name} — ${endDestination.name}`;
     }
 
     if (pointsCount === 3) {
-      const middleDestination = this.#destinationsModel.getDestination(sortedPoints[1].destination);
+      const middleDestination = this.#appModel.getDestination(sortedPoints[1].destination);
       return `${startDestination.name} — ${middleDestination.name} — ${endDestination.name}`;
     }
 
@@ -94,7 +97,7 @@ export default class HeaderPresenter {
   }
 
   #getDuration() {
-    const sortedPoints = sortPoints(this.#pointsModel.points);
+    const sortedPoints = sortPoints(this.#appModel.points);
     const startDate = dayjs(sortedPoints[0].dateFrom);
     const endDate = dayjs(sortedPoints[sortedPoints.length - 1].dateTo);
 
@@ -120,14 +123,14 @@ export default class HeaderPresenter {
   }
 
   #getTotalPrice() {
-    const points = [...this.#pointsModel.points];
+    const points = [...this.#appModel.points];
 
     const basePriceSum = points.reduce((acc, point) => acc + point.basePrice, 0);
 
     let offersSum = 0;
 
     points.forEach((point) => {
-      const selectedOffers = this.#offersModel.getSelectedOffers(point.type, point.offers);
+      const selectedOffers = this.#appModel.getSelectedOffers(point.type, point.offers);
       offersSum += selectedOffers.reduce((acc, offer) => acc + offer.price, 0);
     });
 

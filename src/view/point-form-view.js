@@ -3,7 +3,7 @@ import he from 'he';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPES } from '../utils/const.js';
 import { formatToDateInput, MIN_DIFFERENCE_IN_MINUTES } from '../utils/date.js';
-import { capitalize } from '../utils/text.js';
+import { capitalize } from '../utils/utils.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
 import { isPointDataValid } from '../utils/utils.js';

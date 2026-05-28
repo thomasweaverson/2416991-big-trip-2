@@ -1,5 +1,7 @@
 import { isDatesEqual } from './date';
 
+const capitalize = (word) => word && word[0].toUpperCase() + word.slice(1).toLowerCase();
+
 const isPointsEqual = (pointA, pointB) => {
 
   const isBasePriceEqual = pointA.basePrice === pointB.basePrice;
@@ -27,5 +29,5 @@ const isPointDataValid = (point, destination, destinations) => {
   return isBasePriceValid && isDestinationValid;
 };
 
-export { isPointDataValid, isPointsEqual };
+export { isPointDataValid, isPointsEqual, capitalize };
 

@@ -17,10 +17,7 @@ export default class TripPresenter {
   #pointsListComponent = null;
   #loadingComponent = new LoadingView();
   #loadingErrorComponent = new LoadingErrorView();
-  #offersModel = null;
-  #destinationsModel = null;
-  #pointsModel = null;
-  #newPointModel = null;
+  #appModel = null;
   #filterModel = null;
   #sortComponent = null;
   #currentSortType = SortItem.DEFAULT.name;
@@ -32,7 +29,6 @@ export default class TripPresenter {
   #points = [];
   #newPointButtonComponent = null;
   #isLoading = true;
-  #isDataLoaded = false;
 
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
@@ -41,26 +37,22 @@ export default class TripPresenter {
 
   constructor({
     tripContainer,
-    offersModel,
-    destinationsModel,
-    pointsModel,
+    appModel,
     filterModel,
     newPointButtonComponent
   }) {
     this.#tripContainer = tripContainer;
-    this.#offersModel = offersModel;
-    this.#destinationsModel = destinationsModel;
-    this.#pointsModel = pointsModel;
+    this.#appModel = appModel;
     this.#filterModel = filterModel;
     this.#newPointButtonComponent = newPointButtonComponent;
 
-    this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#appModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get points() {
     this.#currentFilter = this.#filterModel.filter;
-    const points = this.#pointsModel.points;
+    const points = this.#appModel.points;
     const filteredPoints = filter[this.#currentFilter](points);
     return sortPoints(filteredPoints, this.#currentSortType);
   }
@@ -98,7 +90,7 @@ export default class TripPresenter {
       case UserAction.UPDATE_POINT:
         this.#pointPresenters.get(update.id).setSaving();
         try {
-          await this.#pointsModel.updatePoint(updateType, update);
+          await this.#appModel.updatePoint(updateType, update);
           this.#pointPresenters.get(update.id).resetView();
         } catch (error) {
           this.#pointPresenters.get(update.id).setAborting();
@@ -107,7 +99,7 @@ export default class TripPresenter {
       case UserAction.ADD_POINT:
         this.#newPointPresenter.setSaving();
         try {
-          await this.#pointsModel.addPoint(updateType, update);
+          await this.#appModel.addPoint(updateType, update);
         } catch (error) {
           this.#newPointPresenter.setAborting();
         }
@@ -115,7 +107,7 @@ export default class TripPresenter {
       case UserAction.DELETE_POINT:
         this.#pointPresenters.get(update.id).setDeleting();
         try {
-          await this.#pointsModel.deletePoint(updateType, update);
+          await this.#appModel.deletePoint(updateType, update);
         } catch (error) {
           this.#pointPresenters.get(update.id).setAborting();
         }
@@ -142,16 +134,19 @@ export default class TripPresenter {
         break;
       case UpdateType.INIT:
         this.#isLoading = false;
-        this.#isDataLoaded = data.ok;
-
         remove(this.#loadingComponent);
         this.#newPointPresenter = new NewPointPresenter({
-          offers: this.#offersModel.offers,
-          destinations: this.#destinationsModel.destinations,
+          offers: this.#appModel.offers,
+          destinations: this.#appModel.destinations,
           onDataChange: this.#handleViewAction,
           onDestroy: this.#newPointDestroyHandler
         });
         this.#renderBoard();
+        break;
+      case UpdateType.ERROR:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderLoadingError();
         break;
     }
   };
@@ -209,8 +204,7 @@ export default class TripPresenter {
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       pointListContainer: this.#pointsListComponent.element,
-      destinationsModel: this.#destinationsModel,
-      offersModel: this.#offersModel,
+      appModel: this.#appModel,
       onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange
     });
@@ -230,10 +224,10 @@ export default class TripPresenter {
       return;
     }
 
-    if (!this.#isDataLoaded) {
-      this.#renderLoadingError();
-      return;
-    }
+    // if (!this.#isDataLoaded) {
+    //   this.#renderLoadingError();
+    //   return;
+    // }
 
     if (this.points.length === 0) {
       this.#renderNoPoints();

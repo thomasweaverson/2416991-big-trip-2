@@ -90,7 +90,6 @@ export default class NewPointPresenter {
       UpdateType.MINOR,
       pointToAdd
     );
-    this.destroy();
   };
 
   #handleFormReset = () => {

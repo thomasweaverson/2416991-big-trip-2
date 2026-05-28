@@ -360,19 +360,25 @@ export default class PointFormView extends AbstractStatefulView {
   };
 
   #setDatePickers() {
+    const maxDate = new Date(this._state.dateTo);
+    maxDate.setMinutes(maxDate.getMinutes() - MIN_DIFFERENCE_IN_MINUTES);
+
+    const minDate = new Date(this._state.dateFrom);
+    minDate.setMinutes(minDate.getMinutes() + MIN_DIFFERENCE_IN_MINUTES);
+
     this.#datepickers = [
       flatpickr(this.element.querySelector('.event__input--time[name="event-start-time"]'), {
         enableTime: true,
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
-        maxDate: this._state.dateTo,
+        maxDate: maxDate,
         onChange: this.#dateFromChangeHandler
       }),
       flatpickr(this.element.querySelector('.event__input--time[name="event-end-time"]'), {
         enableTime: true,
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
-        minDate: this._state.dateFrom,
+        minDate: minDate,
         onChange: this.#dateToChangeHandler
       })
     ];

@@ -141,7 +141,7 @@ export default class PointPresenter {
       this.#replaceFormToPoint();
       return;
     }
-    const isPatchUpdate = isDatesEqual(this.#point, point);
+    const isPatchUpdate = isDatesEqual(this.#point, point) && this.#point.basePrice === point.basePrice;
 
     this.#handleDataChange(
       UserAction.UPDATE_POINT,

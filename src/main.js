@@ -1,18 +1,17 @@
 import DestinationsApiService from './api/destinations-api-service.js';
 import OffersApiService from './api/offers-api-service.js';
 import PointsApiService from './api/points-api-service.js';
-import { render } from './framework/render.js';
 import DestinationsModel from './model/destinations-model.js';
 import FilterModel from './model/filter-model.js';
 import OffersModel from './model/offers-model.js';
 import PointsModel from './model/points-model.js';
-import FilterPresenter from './presenter/filter-presenter.js';
+import HeaderPresenter from './presenter/header-presenter.js';
 import TripPresenter from './presenter/trip-presenter.js';
 import { AUTHORIZATION, BASE_URL } from './utils/api.js';
 import NewPointButtonView from './view/new-point-button-view.js';
 
-const filterContainer = document.querySelector('.trip-controls__filters');
-const mainContainer = document.querySelector('.trip-main');
+
+const summaryContainer = document.querySelector('.trip-main');
 const tripContainer = document.querySelector('.trip-events');
 
 const filterModel = new FilterModel();
@@ -26,36 +25,34 @@ const pointsModel = new PointsModel({
   pointsApiService: new PointsApiService(BASE_URL, AUTHORIZATION)
 });
 
-const filterPresenter = new FilterPresenter({
-  filterContainer,
-  pointsModel,
-  filterModel
-});
-
-const tripPresenter = new TripPresenter({
-  tripContainer,
-  offersModel,
-  destinationsModel,
-  pointsModel,
-  filterModel,
-  onNewPointDestroy: handleNewPointFormClose
-});
-
 const newPointButtonComponent = new NewPointButtonView({
   onClick: handleNewPointButtonClick
 });
 
-function handleNewPointFormClose() {
-  newPointButtonComponent.element.disabled = false;
-}
+new HeaderPresenter({
+  summaryContainer,
+  pointsModel,
+  offersModel,
+  destinationsModel,
+  filterModel,
+  newPointButtonComponent
+});
+
+const tripPresenter = new TripPresenter({
+  tripContainer,
+  pointsModel,
+  offersModel,
+  destinationsModel,
+  filterModel,
+  newPointButtonComponent
+});
 
 function handleNewPointButtonClick() {
   tripPresenter.createPoint();
-  newPointButtonComponent.element.disabled = true;
+  newPointButtonComponent.disable();
 }
 
 const initApp = async () => {
-  filterPresenter.init();
   tripPresenter.init();
 
   Promise.all([
@@ -68,7 +65,9 @@ const initApp = async () => {
   }).catch(() => {
     // обработать возможные ошибки. Придумать заглушку например
   }).finally(() => {
-    render(newPointButtonComponent, mainContainer);
+
+    //!уйдёт в header presenter
+    // render(newPointButtonComponent, summaryContainer);
   });
 };
 

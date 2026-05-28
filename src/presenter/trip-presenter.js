@@ -30,7 +30,7 @@ export default class TripPresenter {
   #newPointPresenter = null;
 
   #points = [];
-  #handleNewPointDestroy = null;
+  #newPointButtonComponent = null;
   #isLoading = true;
   #isDataLoaded = false;
 
@@ -45,14 +45,14 @@ export default class TripPresenter {
     destinationsModel,
     pointsModel,
     filterModel,
-    onNewPointDestroy
+    newPointButtonComponent
   }) {
     this.#tripContainer = tripContainer;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
-    this.#handleNewPointDestroy = onNewPointDestroy;
+    this.#newPointButtonComponent = newPointButtonComponent;
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -84,7 +84,7 @@ export default class TripPresenter {
   }
 
   #newPointDestroyHandler = () => {
-    this.#handleNewPointDestroy();
+    this.#newPointButtonComponent.enable();
 
     if (this.points.length === 0) {
       this.#renderNoPoints();

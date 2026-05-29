@@ -7,17 +7,20 @@ import FilterPresenter from './filter-presenter';
 
 export default class HeaderPresenter {
   #summaryContainer = null;
-  #appModel = null;
-  #filterModel = null;
-  #filterPresenter = null;
+
   #newPointButtonComponent = null;
   #tripInfoComponent = null;
 
-  constructor({ summaryContainer, appModel, filterModel, newPointButtonComponent }) {
+  #appModel = null;
+  #filterModel = null;
+
+  #filterPresenter = null;
+
+  constructor({ summaryContainer, newPointButtonComponent, appModel, filterModel }) {
     this.#summaryContainer = summaryContainer;
+    this.#newPointButtonComponent = newPointButtonComponent;
     this.#appModel = appModel;
     this.#filterModel = filterModel;
-    this.#newPointButtonComponent = newPointButtonComponent;
 
     this.#filterPresenter = new FilterPresenter({
       filterContainer: summaryContainer.querySelector('.trip-controls__filters'),
@@ -25,37 +28,16 @@ export default class HeaderPresenter {
       filterModel: this.#filterModel
     });
 
-    this.#appModel.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#appModel.addObserver(this.#modelEventHandler);
+    this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
-  #init() {
+  #init = () => {
     this.#renderTripInfo();
     this.#filterPresenter.init();
-  }
-
-  #handleModelEvent = (updateType) => {
-    switch (updateType) {
-      case UpdateType.PATCH:
-      case UpdateType.MINOR:
-      case UpdateType.MAJOR:
-        this.#init();
-        break;
-      case UpdateType.INIT:
-        this.#init();
-        render(this.#newPointButtonComponent, this.#summaryContainer, RenderPosition.BEFOREEND);
-        break;
-      case UpdateType.ERROR:
-        render(this.#newPointButtonComponent, this.#summaryContainer, RenderPosition.BEFOREEND);
-        this.#newPointButtonComponent.disable();
-        this.#filterPresenter.init({
-          isLoadingError: true
-        });
-        break;
-    }
   };
 
-  #renderTripInfo() {
+  #renderTripInfo = () => {
     const title = this.#getTitle();
     const duration = this.#getDuration();
     const total = this.#getTotalPrice();
@@ -77,15 +59,15 @@ export default class HeaderPresenter {
 
     replace(this.#tripInfoComponent, prevTripInfoComponent);
     remove(prevTripInfoComponent);
-  }
+  };
 
-  #getTitle() {
+  #getTitle = () => {
     const sortedPoints = sortPoints(this.#appModel.points);
 
     const pointsCount = sortedPoints.length;
 
     if (pointsCount === 0) {
-      return 'No places';
+      return '';
     }
 
     if (pointsCount === 1) {
@@ -105,9 +87,9 @@ export default class HeaderPresenter {
     }
 
     return `${startDestination.name} — ... — ${endDestination.name}`;
-  }
+  };
 
-  #getDuration() {
+  #getDuration = () => {
     const sortedPoints = sortPoints(this.#appModel.points);
 
     if (sortedPoints.length === 0) {
@@ -123,12 +105,6 @@ export default class HeaderPresenter {
       return startDate.format('D MMM');
     }
 
-    const isSameMonth = startDate.isSame(endDate, 'month');
-
-    if (isSameMonth) {
-      return `${startDate.format('D MMM')} — ${endDate.format('D MMM')}`;
-    }
-
     const isSameYear = startDate.isSame(endDate, 'year');
 
     if (isSameYear) {
@@ -136,9 +112,9 @@ export default class HeaderPresenter {
     }
 
     return `${startDate.format('D MMM YYYY')} — ${endDate.format('D MMM YYYY')}`;
-  }
+  };
 
-  #getTotalPrice() {
+  #getTotalPrice = () => {
     const points = [...this.#appModel.points];
 
     const basePriceSum = points.reduce((acc, point) => acc + point.basePrice, 0);
@@ -151,5 +127,24 @@ export default class HeaderPresenter {
     });
 
     return basePriceSum + offersSum;
-  }
+  };
+
+  #modelEventHandler = (updateType) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+      case UpdateType.MINOR:
+      case UpdateType.MAJOR:
+        this.#init();
+        break;
+      case UpdateType.INIT:
+        this.#init();
+        render(this.#newPointButtonComponent, this.#summaryContainer, RenderPosition.BEFOREEND);
+        break;
+      case UpdateType.ERROR:
+        render(this.#newPointButtonComponent, this.#summaryContainer, RenderPosition.BEFOREEND);
+        this.#newPointButtonComponent.disable();
+        this.#filterPresenter.init();
+        break;
+    }
+  };
 }

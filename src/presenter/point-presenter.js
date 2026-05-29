@@ -11,12 +11,14 @@ const Mode = {
 
 export default class PointPresenter {
   #pointListContainer = null;
-  #appModel = null;
-  #handleDataChange = null;
-  #handleModeChange = null;
 
   #pointComponent = null;
   #pointFormComponent = null;
+
+  #appModel = null;
+
+  #dataChangeHandler = null;
+  #modeChangeHandler = null;
 
   #point = null;
   #mode = Mode.DEFAULT;
@@ -29,11 +31,11 @@ export default class PointPresenter {
   }) {
     this.#pointListContainer = pointListContainer;
     this.#appModel = appModel;
-    this.#handleDataChange = onDataChange;
-    this.#handleModeChange = onModeChange;
+    this.#dataChangeHandler = onDataChange;
+    this.#modeChangeHandler = onModeChange;
   }
 
-  init(point) {
+  init = (point) => {
     this.#point = point;
     const previousPointComponent = this.#pointComponent;
     const previousPointFormComponent = this.#pointFormComponent;
@@ -43,7 +45,7 @@ export default class PointPresenter {
       destination: this.#appModel.getDestination(this.#point.destination),
       selectedOffers: this.#appModel.getSelectedOffers(this.#point.type, this.#point.offers),
       onRollupClick: this.#rollupClickHandler,
-      onFavoriteClick: this.#handleFavoriteClick,
+      onFavoriteClick: this.#favoriteClickHandler,
     });
 
     this.#pointFormComponent = new PointFormView({
@@ -51,7 +53,7 @@ export default class PointPresenter {
       offers: this.#appModel.offers,
       currentDestination: this.#appModel.getDestination(this.#point.destination),
       destinations: this.#appModel.destinations,
-      onFormSubmit: this.#handleFormSubmit,
+      onFormSubmit: this.#formSubmitHandler,
       onFormReset: this.#deleteClickHandler,
       onRollupClick: this.#rollupClickHandler
     });
@@ -71,39 +73,39 @@ export default class PointPresenter {
 
     remove(previousPointComponent);
     remove(previousPointFormComponent);
-  }
+  };
 
-  destroy() {
+  destroy = () => {
     remove(this.#pointComponent);
     remove(this.#pointFormComponent);
-  }
+  };
 
-  resetView() {
+  resetView = () => {
     if (this.#mode !== Mode.DEFAULT) {
       this.#pointFormComponent.reset(this.#point);
       this.#replaceFormToPoint();
     }
-  }
+  };
 
-  setSaving() {
+  setSaving = () => {
     if (this.#mode === Mode.FORM) {
       this.#pointFormComponent.updateElement({
         isDisabled: true,
         isSaving: true,
       });
     }
-  }
+  };
 
-  setDeleting() {
+  setDeleting = () => {
     if (this.#mode === Mode.FORM) {
       this.#pointFormComponent.updateElement({
         isDisabled: true,
         isDeleting: true,
       });
     }
-  }
+  };
 
-  setAborting() {
+  setAborting = () => {
     const resetFormState = () => {
       this.#pointFormComponent.updateElement({
         isDisabled: false,
@@ -113,7 +115,20 @@ export default class PointPresenter {
     };
     this.#pointComponent.shake();
     this.#pointFormComponent.shake(resetFormState);
-  }
+  };
+
+  #replacePointToForm = () => {
+    replace(this.#pointFormComponent, this.#pointComponent);
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#modeChangeHandler();
+    this.#mode = Mode.FORM;
+  };
+
+  #replaceFormToPoint = () => {
+    replace(this.#pointComponent, this.#pointFormComponent);
+    this.#mode = Mode.DEFAULT;
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
 
   #rollupClickHandler = () => {
     if (this.#mode === Mode.DEFAULT) {
@@ -124,7 +139,7 @@ export default class PointPresenter {
     }
   };
 
-  #handleEscKeyDown = (evt) => {
+  #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
       this.#pointFormComponent.reset(this.#point);
@@ -132,10 +147,10 @@ export default class PointPresenter {
     }
   };
 
-  #handleFormSubmit = (point) => {
+  #formSubmitHandler = (point) => {
     const isPatchUpdate = isDatesEqual(this.#point, point) && this.#point.basePrice === point.basePrice;
 
-    this.#handleDataChange(
+    this.#dataChangeHandler(
       UserAction.UPDATE_POINT,
       isPatchUpdate ? UpdateType.PATCH : UpdateType.MINOR,
       point
@@ -143,31 +158,18 @@ export default class PointPresenter {
   };
 
   #deleteClickHandler = () => {
-    this.#handleDataChange(
+    this.#dataChangeHandler(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,
       this.#point
     );
   };
 
-  #handleFavoriteClick = () => {
-    this.#handleDataChange(
+  #favoriteClickHandler = () => {
+    this.#dataChangeHandler(
       UserAction.UPDATE_POINT,
       UpdateType.PATCH,
       { ...this.#point, isFavorite: !this.#point.isFavorite }
     );
   };
-
-  #replacePointToForm() {
-    replace(this.#pointFormComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#handleEscKeyDown);
-    this.#handleModeChange();
-    this.#mode = Mode.FORM;
-  }
-
-  #replaceFormToPoint() {
-    replace(this.#pointComponent, this.#pointFormComponent);
-    this.#mode = Mode.DEFAULT;
-    document.removeEventListener('keydown', this.#handleEscKeyDown);
-  }
 }

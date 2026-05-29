@@ -9,10 +9,10 @@ const EndPoints = {
 };
 
 const Method = {
-  GET: 'GET',
-  POST: 'POST',
-  PUT: 'PUT',
-  DELETE: 'DELETE',
+  GET: 'get',
+  POST: 'post',
+  PUT: 'put',
+  DELETE: 'delete',
 };
 
 export { AUTHORIZATION, BASE_URL, EndPoints, Method };

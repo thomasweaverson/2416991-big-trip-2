@@ -3,21 +3,21 @@ const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-i
 const DEFAULT_POINT_TYPE = POINT_TYPES[5];
 
 const DEFAULT_POINT = {
-  'id': 'new-point',
-  'basePrice': 0,
-  'dateFrom': '',
-  'dateTo': '',
-  'destination': '',
-  'isFavorite': false,
-  'offers': [],
-  'type': DEFAULT_POINT_TYPE
+  id: 'new-point',
+  basePrice: 0,
+  dateFrom: '',
+  dateTo: '',
+  destination: '',
+  isFavorite: false,
+  offers: [],
+  type: DEFAULT_POINT_TYPE
 };
 
 const BLANK_DESTINATION = {
   id: 'new-point',
-  'name': '',
-  'description': '',
-  'pictures': []
+  name: '',
+  description: '',
+  pictures: []
 };
 
 const SortItem = {
@@ -79,8 +79,8 @@ const Message = {
   [FilterType.FUTURE]: 'There are no future events now',
   [FilterType.PAST]: 'There are no past events now',
   [FilterType.PRESENT]: 'There are no present events now',
-  loading: 'Loading...',
-  error: 'Failed to load latest route information'
+  LOADING: 'Loading...',
+  ERROR: 'Failed to load latest route information'
 };
 
 export { BLANK_DESTINATION, DEFAULT_POINT, FilterType, POINT_TYPES, SortItem, TimeLimit, UpdateType, UserAction, Message };

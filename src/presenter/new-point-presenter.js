@@ -3,12 +3,13 @@ import { DEFAULT_POINT, UpdateType, UserAction } from '../utils/const';
 import PointFormView from '../view/point-form-view';
 
 export default class NewPointPresenter {
+  #pointFormComponent = null;
+
   #offers = null;
   #destinations = null;
-  #handleDataChange = null;
-  #handleDestroy = null;
 
-  #pointFormComponent = null;
+  #dataChangeHandler = null;
+  #destroyHandler = null;
 
   constructor({
     offers,
@@ -18,11 +19,11 @@ export default class NewPointPresenter {
   }) {
     this.#offers = offers;
     this.#destinations = destinations;
-    this.#handleDataChange = onDataChange;
-    this.#handleDestroy = onDestroy;
+    this.#dataChangeHandler = onDataChange;
+    this.#destroyHandler = onDestroy;
   }
 
-  init(pointsListContainer) {
+  init = (pointsListContainer) => {
     if (this.#pointFormComponent !== null) {
       return;
     }
@@ -33,8 +34,8 @@ export default class NewPointPresenter {
       },
       offers: this.#offers,
       destinations: this.#destinations,
-      onFormSubmit: this.#handleFormSubmit,
-      onFormReset: this.#handleFormReset,
+      onFormSubmit: this.#formSubmitHandler,
+      onFormReset: this.#formResetHandler,
       onRollupClick: null,
       isNewPoint: true
     });
@@ -46,29 +47,29 @@ export default class NewPointPresenter {
     );
 
     document.addEventListener('keydown', this.#escKeyDownHandler);
-  }
+  };
 
-  destroy() {
+  destroy = () => {
     if (this.#pointFormComponent === null) {
       return;
     }
 
-    this.#handleDestroy();
+    this.#destroyHandler();
 
     remove(this.#pointFormComponent);
     this.#pointFormComponent = null;
 
     document.removeEventListener('keydown', this.#escKeyDownHandler);
-  }
+  };
 
-  setSaving() {
+  setSaving = () => {
     this.#pointFormComponent.updateElement({
       isDisabled: true,
       isSaving: true,
     });
-  }
+  };
 
-  setAborting() {
+  setAborting = () => {
     const resetFormState = () => {
       this.#pointFormComponent.updateElement({
         isDisabled: false,
@@ -76,23 +77,23 @@ export default class NewPointPresenter {
       });
     };
     this.#pointFormComponent.shake(resetFormState);
-  }
+  };
 
-  #handleFormSubmit = (point) => {
+  #formSubmitHandler = (point) => {
     const pointToAdd = {
       ...point,
     };
 
     delete pointToAdd.id;
 
-    this.#handleDataChange(
+    this.#dataChangeHandler(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
       pointToAdd
     );
   };
 
-  #handleFormReset = () => {
+  #formResetHandler = () => {
     this.destroy();
   };
 

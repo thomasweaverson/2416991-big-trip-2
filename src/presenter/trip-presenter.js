@@ -1,12 +1,10 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
-import { FilterType, SortItem, TimeLimit, UpdateType, UserAction } from '../utils/const.js';
+import { FilterType, Message, SortItem, TimeLimit, UpdateType, UserAction } from '../utils/const.js';
 import { filter } from '../utils/filter.js';
 
 import { sortPoints } from '../utils/sort.js';
-import LoadingErrorView from '../view/loading-error-view.js';
-import LoadingView from '../view/loading-view.js';
-import NoPointsView from '../view/no-points-view.js';
+import MessageView from '../view/message-view.js';
 import PointsListView from '../view/points-list-view.js';
 import SortView from '../view/sort-view.js';
 import NewPointPresenter from './new-point-presenter.js';
@@ -15,8 +13,8 @@ import PointPresenter from './point-presenter.js';
 export default class TripPresenter {
   #tripContainer = null;
   #pointsListComponent = null;
-  #loadingComponent = new LoadingView();
-  #loadingErrorComponent = new LoadingErrorView();
+  #loadingComponent = new MessageView({ message: Message.loading });
+  #loadingErrorComponent = new MessageView({ message: Message.error });
   #appModel = null;
   #filterModel = null;
   #sortComponent = null;
@@ -179,8 +177,8 @@ export default class TripPresenter {
   };
 
   #renderNoPoints() {
-    this.#noPointsComponent = new NoPointsView({
-      currentFilter: this.#currentFilter
+    this.#noPointsComponent = new MessageView({
+      message: Message[this.#currentFilter]
     });
     render(this.#noPointsComponent, this.#tripContainer);
   }
@@ -223,11 +221,6 @@ export default class TripPresenter {
       this.#renderLoading();
       return;
     }
-
-    // if (!this.#isDataLoaded) {
-    //   this.#renderLoadingError();
-    //   return;
-    // }
 
     if (this.points.length === 0) {
       this.#renderNoPoints();

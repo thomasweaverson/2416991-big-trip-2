@@ -11,7 +11,6 @@ const tripContainer = document.querySelector('.trip-events');
 
 const appApiService = new AppApiService(BASE_URL, AUTHORIZATION);
 const appModel = new AppModel({ appApiService });
-
 const filterModel = new FilterModel();
 
 const newPointButtonComponent = new NewPointButtonView({

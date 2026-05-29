@@ -1,7 +1,6 @@
 import { remove, render, replace } from '../framework/render';
 import { UpdateType, UserAction } from '../utils/const';
 import { isDatesEqual } from '../utils/date';
-import { isPointsEqual } from '../utils/utils';
 import PointFormView from '../view/point-form-view';
 import PointView from '../view/point-view';
 
@@ -134,10 +133,6 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (point) => {
-    if (isPointsEqual(this.#point, point)) {
-      this.#replaceFormToPoint();
-      return;
-    }
     const isPatchUpdate = isDatesEqual(this.#point, point) && this.#point.basePrice === point.basePrice;
 
     this.#handleDataChange(
@@ -145,7 +140,6 @@ export default class PointPresenter {
       isPatchUpdate ? UpdateType.PATCH : UpdateType.MINOR,
       point
     );
-    // this.#replaceFormToPoint();
   };
 
   #deleteClickHandler = () => {

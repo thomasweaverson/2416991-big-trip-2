@@ -9,6 +9,8 @@ const isFilterDisabled = (filterType, points, isLoadingError) => {
   }
   const now = dayjs();
   switch (filterType) {
+    case FilterType.EVERYTHING:
+      return points.length === 0;
     case FilterType.FUTURE:
       return !points.some((point) => dayjs(point.dateFrom).isAfter(now));
     case FilterType.PAST:

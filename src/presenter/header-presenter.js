@@ -61,7 +61,14 @@ export default class HeaderPresenter {
     const total = this.#getTotalPrice();
 
     const prevTripInfoComponent = this.#tripInfoComponent;
-    this.#tripInfoComponent = new TripInfoView({ title, duration, total });
+
+    if (title && duration && total) {
+      this.#tripInfoComponent = new TripInfoView({ title, duration, total });
+    } else {
+      this.#tripInfoComponent = null;
+      remove(prevTripInfoComponent);
+      return;
+    }
 
     if (prevTripInfoComponent === null) {
       render(this.#tripInfoComponent, this.#summaryContainer, RenderPosition.AFTERBEGIN);
@@ -76,6 +83,10 @@ export default class HeaderPresenter {
     const sortedPoints = sortPoints(this.#appModel.points);
 
     const pointsCount = sortedPoints.length;
+
+    if (pointsCount === 0) {
+      return 'No places';
+    }
 
     if (pointsCount === 1) {
       const destination = this.#appModel.getDestination(sortedPoints[0].destination);
@@ -98,6 +109,11 @@ export default class HeaderPresenter {
 
   #getDuration() {
     const sortedPoints = sortPoints(this.#appModel.points);
+
+    if (sortedPoints.length === 0) {
+      return '';
+    }
+
     const startDate = dayjs(sortedPoints[0].dateFrom);
     const endDate = dayjs(sortedPoints[sortedPoints.length - 1].dateTo);
 
@@ -110,7 +126,7 @@ export default class HeaderPresenter {
     const isSameMonth = startDate.isSame(endDate, 'month');
 
     if (isSameMonth) {
-      return `${startDate.format('D')} — ${endDate.format('D MMM')}`;
+      return `${startDate.format('D MMM')} — ${endDate.format('D MMM')}`;
     }
 
     const isSameYear = startDate.isSame(endDate, 'year');

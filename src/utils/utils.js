@@ -1,19 +1,4 @@
-import { isDatesEqual } from './date';
-
 const capitalize = (word) => word && word[0].toUpperCase() + word.slice(1).toLowerCase();
-
-const isPointsEqual = (pointA, pointB) => {
-
-  const isBasePriceEqual = pointA.basePrice === pointB.basePrice;
-  const isDatesSame = isDatesEqual(pointA, pointB);
-
-  const isDestinationEqual = pointA.destination === pointB.destination;
-  const isFavoriteEqual = pointA.isFavorite === pointB.isFavorite;
-  const isOffersEqual = pointA.offers.length === pointB.offers.length && pointA.offers.every((offer) => pointB.offers.includes(offer));
-  const isTypeEqual = pointA.type === pointB.type;
-
-  return isBasePriceEqual && isDatesSame && isDestinationEqual && isFavoriteEqual && isOffersEqual && isTypeEqual;
-};
 
 const isCorrectNumber = (value) =>
   !isNaN(+value) && value !== '' &&
@@ -29,5 +14,5 @@ const isPointDataValid = (point, destination, destinations) => {
   return isBasePriceValid && isDestinationValid;
 };
 
-export { isPointDataValid, isPointsEqual, capitalize };
+export { isPointDataValid, capitalize };
 

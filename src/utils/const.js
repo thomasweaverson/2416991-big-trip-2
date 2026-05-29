@@ -13,6 +13,13 @@ const DEFAULT_POINT = {
   'type': DEFAULT_POINT_TYPE
 };
 
+const BLANK_DESTINATION = {
+  id: 'new-point',
+  'name': '',
+  'description': '',
+  'pictures': []
+};
+
 const SortItem = {
   DEFAULT: {
     name: 'day',
@@ -67,5 +74,5 @@ const TimeLimit = {
   UPPER_LIMIT: 1000,
 };
 
-export { DEFAULT_POINT, FilterType, POINT_TYPES, SortItem, UpdateType, UserAction, TimeLimit };
+export { DEFAULT_POINT, FilterType, POINT_TYPES, SortItem, UpdateType, UserAction, TimeLimit, BLANK_DESTINATION };
 

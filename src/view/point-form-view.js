@@ -1,11 +1,12 @@
 import flatpickr from 'flatpickr';
 import he from 'he';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { POINT_TYPES } from '../utils/const.js';
+import { BLANK_DESTINATION, POINT_TYPES } from '../utils/const.js';
 import { formatToDateInput, MIN_DIFFERENCE_IN_MINUTES } from '../utils/date.js';
 import { capitalize } from '../utils/utils.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
+import { createElement, RenderPosition } from '../framework/render.js';
 import { isPointDataValid } from '../utils/utils.js';
 
 const createTypeItemTemplate = (type, id) => `
@@ -159,7 +160,7 @@ const createPhotoTapeTemplate = (pictures) => {
 };
 
 const createDestinationTemplate = (destination) => {
-  if (!destination || (!destination.pictures && !destination.description)) {
+  if (!destination || (!destination.pictures.length && !destination.description)) {
     return '';
   }
 
@@ -293,7 +294,8 @@ export default class PointFormView extends AbstractStatefulView {
     }
 
     this.element.querySelector('.event__type-list').addEventListener('click', this.#typeClickHandler);
-    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
+    // this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#priceChangeHandler);
 
     const availableOffers = this.element.querySelector('.event__available-offers');
@@ -326,15 +328,28 @@ export default class PointFormView extends AbstractStatefulView {
     });
   };
 
-  #destinationChangeHandler = (evt) => {
+  #destinationInputHandler = (evt) => {
+    evt.preventDefault();
     const destinationName = evt.target.value;
+
     const destination = this.#destinations.find((item) => item.name === destinationName);
 
-    const destinationId = destination ? destination.id : `id-${destinationName}`;
+    if (!destination) {
+      const destinationContainer = this.element.querySelector('.event__section--destination');
+      destinationContainer?.remove();
+    } else {
+      this._setState({
+        destination: destination.id
+      });
+      const destinationsTemplate = createDestinationTemplate(destination);
+      const destinationsElement = createElement(destinationsTemplate);
 
-    this.updateElement({
-      destination: destinationId
-    });
+      const pointDetailsContainer = this.element.querySelector('.event__details');
+
+      if (destinationsElement) {
+        pointDetailsContainer.insertAdjacentElement(RenderPosition.BEFOREEND, destinationsElement);
+      }
+    }
   };
 
   #dateFromChangeHandler = ([userDate]) => {
@@ -423,9 +438,9 @@ export default class PointFormView extends AbstractStatefulView {
     if (currentDestination) {
       return currentDestination;
     }
+
     return {
-      id: this._state.destination,
-      name: this._state.destination.slice(3)
+      ...BLANK_DESTINATION,
     };
   }
 

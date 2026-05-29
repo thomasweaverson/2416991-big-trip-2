@@ -266,11 +266,6 @@ export default class PointFormView extends AbstractStatefulView {
     });
   }
 
-  // updateElement(point) {
-  //   super.updateElement(point);
-  //   this.#setDisableStateSubmitButton();
-  // }
-
   removeElement() {
     super.removeElement();
 
@@ -294,7 +289,6 @@ export default class PointFormView extends AbstractStatefulView {
     }
 
     this.element.querySelector('.event__type-list').addEventListener('click', this.#typeClickHandler);
-    // this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#priceChangeHandler);
 

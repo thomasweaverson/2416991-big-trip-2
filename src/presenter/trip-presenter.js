@@ -13,13 +13,13 @@ import PointPresenter from './point-presenter.js';
 export default class TripPresenter {
   #tripContainer = null;
   #pointsListComponent = null;
-  #loadingComponent = new MessageView({ message: Message.loading });
-  #loadingErrorComponent = new MessageView({ message: Message.error });
+
+  #messageComponent = null;
+
   #appModel = null;
   #filterModel = null;
   #sortComponent = null;
   #currentSortType = SortItem.DEFAULT.name;
-  #noPointsComponent = null;
   #currentFilter = FilterType.EVERYTHING;
   #pointPresenters = new Map();
   #newPointPresenter = null;
@@ -64,20 +64,29 @@ export default class TripPresenter {
     this.#filterModel.filter = FilterType.EVERYTHING;
 
     if (this.points.length === 0) {
-      if (this.#noPointsComponent) {
-        remove(this.#noPointsComponent);
+      if (this.#messageComponent) {
+        remove(this.#messageComponent);
+        this.#messageComponent = null;
       }
       this.#renderPointsList();
     }
+
+    this.#newPointPresenter = new NewPointPresenter({
+      offers: this.#appModel.offers,
+      destinations: this.#appModel.destinations,
+      onDataChange: this.#handleViewAction,
+      onDestroy: this.#newPointDestroyHandler
+    });
 
     this.#newPointPresenter.init(this.#pointsListComponent.element);
   }
 
   #newPointDestroyHandler = () => {
-    this.#newPointButtonComponent.enable();
 
+    this.#newPointButtonComponent.enable();
+    this.#newPointPresenter = null;
     if (this.points.length === 0) {
-      this.#renderNoPoints();
+      this.#renderBoard();
     }
   };
 
@@ -132,39 +141,14 @@ export default class TripPresenter {
         break;
       case UpdateType.INIT:
         this.#isLoading = false;
-        remove(this.#loadingComponent);
-        this.#newPointPresenter = new NewPointPresenter({
-          offers: this.#appModel.offers,
-          destinations: this.#appModel.destinations,
-          onDataChange: this.#handleViewAction,
-          onDestroy: this.#newPointDestroyHandler
-        });
         this.#renderBoard();
         break;
       case UpdateType.ERROR:
         this.#isLoading = false;
-        remove(this.#loadingComponent);
-        this.#renderLoadingError();
+        this.#renderMessage(Message.error);
         break;
     }
   };
-
-  #renderLoading() {
-    render(this.#loadingComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
-  }
-
-  #renderLoadingError() {
-    render(this.#loadingErrorComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
-  }
-
-  #renderSort() {
-    this.#sortComponent = new SortView({
-      currentSortType: this.#currentSortType,
-      onSortTypeChange: this.#handleSortTypeChange
-    });
-
-    render(this.#sortComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
-  }
 
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
@@ -176,12 +160,23 @@ export default class TripPresenter {
     this.#renderPoints();
   };
 
-  #renderNoPoints() {
-    this.#noPointsComponent = new MessageView({
-      message: Message[this.#currentFilter]
+  #renderSort() {
+
+    this.#sortComponent = new SortView({
+      currentSortType: this.#currentSortType,
+      onSortTypeChange: this.#handleSortTypeChange
     });
-    render(this.#noPointsComponent, this.#tripContainer);
+
+    render(this.#sortComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
+
   }
+
+  #handleModeChange = () => {
+    if (this.#newPointPresenter !== null) {
+      this.#newPointPresenter.destroy();
+    }
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
 
   #renderPointsList() {
     const previousPointsListComponent = this.#pointsListComponent;
@@ -193,11 +188,6 @@ export default class TripPresenter {
 
     render(this.#pointsListComponent, this.#tripContainer);
   }
-
-  #handleModeChange = () => {
-    this.#newPointPresenter.destroy();
-    this.#pointPresenters.forEach((presenter) => presenter.resetView());
-  };
 
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
@@ -216,40 +206,59 @@ export default class TripPresenter {
     });
   }
 
+  #renderMessage(message) {
+    this.#clearBoard();
+    this.#messageComponent = new MessageView({ message });
+    render(this.#messageComponent, this.#tripContainer);
+  }
+
+  #clearMessage() {
+    if (this.#messageComponent) {
+      remove(this.#messageComponent);
+    }
+    this.#messageComponent = null;
+  }
+
   #renderBoard() {
     if (this.#isLoading) {
-      this.#renderLoading();
+      this.#renderMessage(Message.loading);
       return;
     }
 
-    if (this.points.length === 0) {
-      this.#renderNoPoints();
+    if (this.points.length === 0 && this.#newPointPresenter === null) {
+      this.#renderMessage(Message[this.#currentFilter]);
       return;
     }
 
-    this.#renderSort();
+    this.#clearMessage();
+
+    if (this.#sortComponent === null) {
+      this.#renderSort();
+    }
     this.#renderPointsList();
     this.#renderPoints();
   }
 
   #clearPoints() {
-    this.#newPointPresenter.destroy();
+    if (this.#newPointPresenter) {
+      const previousNewPointPresenter = this.#newPointPresenter;
+      this.#newPointPresenter = null;
+      previousNewPointPresenter.destroy();
+    }
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
-
   }
 
   #clearBoard({ resetSortType = false } = {}) {
+    this.#clearMessage();
     this.#clearPoints();
     remove(this.#sortComponent);
+    this.#sortComponent = null;
     remove(this.#pointsListComponent);
+    this.#pointsListComponent = null;
 
     if (resetSortType) {
       this.#currentSortType = SortItem.DEFAULT.name;
-    }
-
-    if (this.#noPointsComponent) {
-      remove(this.#noPointsComponent);
     }
   }
 }

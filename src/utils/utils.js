@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 const capitalize = (word) => word && word[0].toUpperCase() + word.slice(1).toLowerCase();
 
 const MAX_PRICE = 100000;
@@ -9,11 +11,16 @@ const isCorrectNumber = (value) =>
 
 const isPointDataValid = (point, destination, destinations) => {
   const isBasePriceValid = isCorrectNumber(point.basePrice) && point.basePrice > 0 && point.basePrice <= MAX_PRICE;
+
   const isDestinationValid =
     destinations.some((destinationItem) => destinationItem.id === destination.id) &&
     destinations.some((destinationItem) => destinationItem.id === point.destination);
 
-  return isBasePriceValid && isDestinationValid;
+  const isDateToValid = dayjs(point.dateTo).isValid();
+  const isDateFromValid = dayjs(point.dateFrom).isValid();
+  const isDateValid = isDateToValid && isDateFromValid && dayjs(point.dateTo).isAfter(dayjs(point.dateFrom));
+
+  return isBasePriceValid && isDestinationValid && isDateValid;
 };
 
 export { capitalize, isPointDataValid };

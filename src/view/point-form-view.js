@@ -53,6 +53,7 @@ const createDestinationInputTemplate = ({
           <input
             class="event__input event__input--destination"
             id="event-destination-${id}"
+            autocomplete="off"
             type="text"
             name="event-destination"
             value="${he.encode(currentDestination.name)}"
@@ -302,11 +303,17 @@ export default class PointFormView extends AbstractStatefulView {
   };
 
   #setDatePickers = () => {
-    const maxDate = new Date(this._state.dateTo);
-    maxDate.setMinutes(maxDate.getMinutes() - MIN_DIFFERENCE_IN_MINUTES);
+    let maxDate;
+    if (this._state.dateTo) {
+      maxDate = new Date(this._state.dateTo);
+      maxDate.setMinutes(maxDate.getMinutes() - MIN_DIFFERENCE_IN_MINUTES);
+    }
 
-    const minDate = new Date(this._state.dateFrom);
-    minDate.setMinutes(minDate.getMinutes() + MIN_DIFFERENCE_IN_MINUTES);
+    let minDate;
+    if (this._state.dateFrom) {
+      minDate = new Date(this._state.dateFrom);
+      minDate.setMinutes(minDate.getMinutes() + MIN_DIFFERENCE_IN_MINUTES);
+    }
 
     this.#datepickers = [
       flatpickr(this.element.querySelector('.event__input--time[name="event-start-time"]'), {
@@ -325,7 +332,6 @@ export default class PointFormView extends AbstractStatefulView {
       })
     ];
   };
-
 
   #setDisableStateSubmitButton = () => {
     const submitButton = this.element.querySelector('.event__save-btn');
@@ -387,6 +393,9 @@ export default class PointFormView extends AbstractStatefulView {
     if (!destination) {
       const destinationContainer = this.element.querySelector('.event__section--destination');
       destinationContainer?.remove();
+      this._setState({
+        destination: null
+      });
     } else {
       this._setState({
         destination: destination.id
@@ -400,6 +409,7 @@ export default class PointFormView extends AbstractStatefulView {
         pointDetailsContainer.insertAdjacentElement(RenderPosition.BEFOREEND, destinationsElement);
       }
     }
+    this.#setDisableStateSubmitButton();
   };
 
   #dateFromChangeHandler = ([userDate]) => {
@@ -411,6 +421,7 @@ export default class PointFormView extends AbstractStatefulView {
     minDate.setMinutes(minDate.getMinutes() + MIN_DIFFERENCE_IN_MINUTES);
 
     this.#datepickers[1].set('minDate', minDate);
+    this.#setDisableStateSubmitButton();
   };
 
   #dateToChangeHandler = ([userDate]) => {
@@ -422,6 +433,7 @@ export default class PointFormView extends AbstractStatefulView {
     maxDate.setMinutes(maxDate.getMinutes() - MIN_DIFFERENCE_IN_MINUTES);
 
     this.#datepickers[0].set('maxDate', maxDate);
+    this.#setDisableStateSubmitButton();
   };
 
   #priceChangeHandler = (evt) => {

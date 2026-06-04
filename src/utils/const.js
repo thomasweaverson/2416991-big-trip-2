@@ -1,18 +1,23 @@
-const DESTINATION_ID_START = 1001;
-
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 const DEFAULT_POINT_TYPE = POINT_TYPES[5];
 
 const DEFAULT_POINT = {
-  'id': 'new-point',
-  'basePrice': 0,
-  'dateFrom': '',
-  'dateTo': '',
-  'destination': '',
-  'isFavorite': false,
-  'offers': [],
-  'type': DEFAULT_POINT_TYPE
+  id: 'new-point',
+  basePrice: 0,
+  dateFrom: '',
+  dateTo: '',
+  destination: '',
+  isFavorite: false,
+  offers: [],
+  type: DEFAULT_POINT_TYPE
+};
+
+const BLANK_DESTINATION = {
+  id: 'new-point',
+  name: '',
+  description: '',
+  pictures: []
 };
 
 const SortItem = {
@@ -53,7 +58,8 @@ const UpdateType = {
   PATCH: 'patch',
   MINOR: 'minor',
   MAJOR: 'major',
-  INIT: 'init'
+  INIT: 'init',
+  ERROR: 'error'
 };
 
 const FilterType = {
@@ -68,5 +74,14 @@ const TimeLimit = {
   UPPER_LIMIT: 1000,
 };
 
-export { DEFAULT_POINT, DESTINATION_ID_START, FilterType, POINT_TYPES, SortItem, UpdateType, UserAction, TimeLimit };
+const Message = {
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.FUTURE]: 'There are no future events now',
+  [FilterType.PAST]: 'There are no past events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  LOADING: 'Loading...',
+  ERROR: 'Failed to load latest route information'
+};
+
+export { BLANK_DESTINATION, DEFAULT_POINT, FilterType, POINT_TYPES, SortItem, TimeLimit, UpdateType, UserAction, Message };
 

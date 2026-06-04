@@ -1,31 +1,27 @@
-import { isDatesEqual } from './date';
+import dayjs from 'dayjs';
 
-const isPointsEqual = (pointA, pointB) => {
+const capitalize = (word) => word && word[0].toUpperCase() + word.slice(1).toLowerCase();
 
-  const isBasePriceEqual = pointA.basePrice === pointB.basePrice;
-  const isDatesSame = isDatesEqual(pointA, pointB);
+const MAX_PRICE = 100000;
 
-  const isDestinationEqual = pointA.destination === pointB.destination;
-  const isFavoriteEqual = pointA.isFavorite === pointB.isFavorite;
-  const isOffersEqual = pointA.offers.length === pointB.offers.length && pointA.offers.every((offer) => pointB.offers.includes(offer));
-  const isTypeEqual = pointA.type === pointB.type;
-
-  return isBasePriceEqual && isDatesSame && isDestinationEqual && isFavoriteEqual && isOffersEqual && isTypeEqual;
-};
-
-const isNumber = (value) =>
+const isCorrectNumber = (value) =>
   !isNaN(+value) && value !== '' &&
   String(+value) === String(value) &&
   Number.isInteger(+value);
 
 const isPointDataValid = (point, destination, destinations) => {
-  const isBasePriceValid = isNumber(point.basePrice) && point.basePrice > 0;
+  const isBasePriceValid = isCorrectNumber(point.basePrice) && point.basePrice > 0 && point.basePrice <= MAX_PRICE;
+
   const isDestinationValid =
     destinations.some((destinationItem) => destinationItem.id === destination.id) &&
     destinations.some((destinationItem) => destinationItem.id === point.destination);
 
-  return isBasePriceValid && isDestinationValid;
+  const isDateToValid = dayjs(point.dateTo).isValid();
+  const isDateFromValid = dayjs(point.dateFrom).isValid();
+  const isDateValid = isDateToValid && isDateFromValid && dayjs(point.dateTo).isAfter(dayjs(point.dateFrom));
+
+  return isBasePriceValid && isDestinationValid && isDateValid;
 };
 
-export { isPointDataValid, isPointsEqual };
+export { capitalize, isPointDataValid };
 

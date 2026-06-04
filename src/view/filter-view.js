@@ -1,11 +1,14 @@
 import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view.js';
 import { FilterType } from '../utils/const.js';
-import { capitalize } from '../utils/text.js';
+import { capitalize } from '../utils/utils.js';
 
 const isFilterDisabled = (filterType, points) => {
+
   const now = dayjs();
   switch (filterType) {
+    case FilterType.EVERYTHING:
+      return points.length === 0;
     case FilterType.FUTURE:
       return !points.some((point) => dayjs(point.dateFrom).isAfter(now));
     case FilterType.PAST:

@@ -1,9 +1,19 @@
 import ApiService from '../framework/api-service';
 import { EndPoints, Method } from '../utils/api';
 
-export default class PointsApiService extends ApiService {
+export default class AppApiService extends ApiService {
   get points() {
     return this._load({ url: EndPoints.POINTS })
+      .then(ApiService.parseResponse);
+  }
+
+  get destinations() {
+    return this._load({ url: EndPoints.DESTINATIONS })
+      .then(ApiService.parseResponse);
+  }
+
+  get offers() {
+    return this._load({ url: EndPoints.OFFERS })
       .then(ApiService.parseResponse);
   }
 
@@ -34,12 +44,10 @@ export default class PointsApiService extends ApiService {
   }
 
   async deletePoint(point) {
-    // как будто return не нужен. Оставить на рефакторинг
-    const response = await this._load({
+    await this._load({
       url: `${EndPoints.POINTS}/${point.id}`,
       method: Method.DELETE,
     });
-    return response;
   }
 
   #adaptToServer(point) {

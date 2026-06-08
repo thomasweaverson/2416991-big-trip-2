@@ -234,7 +234,7 @@ export default class PointFormView extends AbstractStatefulView {
   #handleFormReset = null;
   #handleRollupClick = null;
 
-  #datepickers = [];
+  #datePickers = [];
   #isNewPoint = false;
 
   constructor({
@@ -271,9 +271,9 @@ export default class PointFormView extends AbstractStatefulView {
   removeElement = () => {
     super.removeElement();
 
-    if (this.#datepickers.length > 0) {
-      this.#datepickers.forEach((datepicker) => datepicker.destroy());
-      this.#datepickers = [];
+    if (this.#datePickers.length > 0) {
+      this.#datePickers.forEach((datePicker) => datePicker.destroy());
+      this.#datePickers = [];
     }
   };
 
@@ -315,7 +315,7 @@ export default class PointFormView extends AbstractStatefulView {
       minDate.setMinutes(minDate.getMinutes() + MIN_DIFFERENCE_IN_MINUTES);
     }
 
-    this.#datepickers = [
+    this.#datePickers = [
       flatpickr(this.element.querySelector('.event__input--time[name="event-start-time"]'), {
         enableTime: true,
         'time_24hr': true,
@@ -420,7 +420,7 @@ export default class PointFormView extends AbstractStatefulView {
     const minDate = new Date(userDate);
     minDate.setMinutes(minDate.getMinutes() + MIN_DIFFERENCE_IN_MINUTES);
 
-    this.#datepickers[1].set('minDate', minDate);
+    this.#datePickers[1].set('minDate', minDate);
     this.#setDisableStateSubmitButton();
   };
 
@@ -432,7 +432,7 @@ export default class PointFormView extends AbstractStatefulView {
     const maxDate = new Date(userDate);
     maxDate.setMinutes(maxDate.getMinutes() - MIN_DIFFERENCE_IN_MINUTES);
 
-    this.#datepickers[0].set('maxDate', maxDate);
+    this.#datePickers[0].set('maxDate', maxDate);
     this.#setDisableStateSubmitButton();
   };
 

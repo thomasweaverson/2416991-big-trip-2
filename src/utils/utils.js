@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 
-const capitalize = (word) => word && word[0].toUpperCase() + word.slice(1).toLowerCase();
-
 const MAX_PRICE = 100000;
+
+const capitalize = (word) => word && word[0].toUpperCase() + word.slice(1).toLowerCase();
 
 const isCorrectNumber = (value) =>
   !isNaN(+value) && value !== '' &&
